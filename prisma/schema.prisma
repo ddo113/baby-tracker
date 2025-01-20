@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  children  Baby[]
+}
+
+model Baby {
+  id        String   @id @default(uuid())
+  name      String
+  birthDate DateTime
+  gender    String
+  parentId  String
+  parent    User     @relation(fields: [parentId], references: [id])
+  activities Activity[]
+  medical   MedicalRecord[]
+  growth    GrowthRecord[]
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id])
+  type      String
+  startTime DateTime
+  endTime   DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model MedicalRecord {
+  id        String   @id @default(uuid())
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id])
+  type      String
+  date      DateTime
+  doctor    String?
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model GrowthRecord {
+  id        String   @id @default(uuid())
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id])
+  date      DateTime
+  weight    Float?
+  height    Float?
+  createdAt DateTime @default(now())
+}
